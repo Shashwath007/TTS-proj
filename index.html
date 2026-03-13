@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceDoc — Document to Speech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/audio-player.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">🎙️</span>
+      <span class="brand-name">VoiceDoc</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-tagline">Document → Speech</span>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <span class="toggle-icon" id="toggleIcon">☀️</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-glow"></div>
+    <h1 class="hero-title">Turn Any Doc Into <br/><span class="gradient-text">Voice</span></h1>
+    <p class="hero-sub">Upload a photo of printed text — we extract and speak it aloud.</p>
+  </section>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+
+    <!-- UPLOAD CARD -->
+    <div class="upload-card glass-card" id="uploadCard">
+      <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Click or drag to upload image">
+        <div class="drop-icon">📄</div>
+        <p class="drop-title">Drop your document image here</p>
+        <p class="drop-sub">or <span class="browse-link" id="browseLink">click to browse</span></p>
+        <p class="drop-formats">Supports JPG · PNG · BMP</p>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.bmp" hidden />
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-area" id="previewArea" hidden>
+        <img id="previewImg" class="preview-img" alt="Document preview" />
+        <div class="preview-meta" id="previewMeta"></div>
+        <button class="remove-btn" id="removeBtn" aria-label="Remove image">✕ Remove</button>
+      </div>
+
+      <!-- CONVERT BUTTON -->
+      <button class="convert-btn" id="convertBtn" disabled>
+        <span class="btn-icon">⚡</span>
+        <span class="btn-text">Convert to Speech</span>
+      </button>
+    </div>
+
+    <!-- LOADING PANEL -->
+    <div class="loading-panel" id="loadingPanel" hidden>
+      <div class="loading-steps">
+        <div class="step-item" id="step1">
+          <div class="step-indicator">
+            <div class="step-spinner"></div>
+            <div class="step-check">✓</div>
+          </div>
+          <div class="step-info">
+            <span class="step-label">Preprocessing Image</span>
+            <span class="step-desc">Grayscale · Denoising · Thresholding</span>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item pending" id="step2">
+          <div class="step-indicator">
+            <div class="step-spinner"></div>
+            <div class="step-check">✓</div>
+          </div>
+          <div class="step-info">
+            <span class="step-label">Running OCR</span>
+            <span class="step-desc">Extracting text with Tesseract</span>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item pending" id="step3">
+          <div class="step-indicator">
+            <div class="step-spinner"></div>
+            <div class="step-check">✓</div>
+          </div>
+          <div class="step-info">
+            <span class="step-label">Generating Audio</span>
+            <span class="step-desc">Synthesizing speech with gTTS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="result-panel glass-card" id="resultPanel" hidden>
+      <div class="result-header">
+        <h2 class="result-title">✅ Conversion Complete</h2>
+        <div class="result-stats" id="resultStats"></div>
+      </div>
+
+      <!-- TEXT RESULT -->
+      <div class="text-section">
+        <div class="section-header">
+          <h3>Extracted Text</h3>
+          <button class="copy-btn" id="copyBtn">📋 Copy</button>
+        </div>
+        <div class="text-box" id="textBox"></div>
+      </div>
+
+      <!-- AUDIO PLAYER -->
+      <div class="audio-section">
+        <h3>Listen</h3>
+        <div class="custom-player" id="customPlayer">
+          <button class="play-pause-btn" id="playPauseBtn" aria-label="Play/Pause">
+            <span class="play-icon">▶</span>
+            <span class="pause-icon" hidden>⏸</span>
+          </button>
+          <div class="player-right">
+            <div class="seekbar-wrap">
+              <input type="range" class="seekbar" id="seekbar" value="0" min="0" step="0.01" />
+            </div>
+            <div class="player-bottom-row">
+              <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+              <div class="speed-volume-wrap">
+                <select class="speed-select" id="speedSelect">
+                  <option value="0.75">0.75×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="1.25">1.25×</option>
+                  <option value="1.5">1.5×</option>
+                  <option value="2">2×</option>
+                </select>
+                <div class="volume-wrap">
+                  <span class="vol-icon" id="volIcon">🔊</span>
+                  <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <audio id="audioEl" preload="auto"></audio>
+      </div>
+
+      <!-- DOWNLOAD BUTTONS -->
+      <div class="download-row">
+        <button class="dl-btn dl-mp3" id="dlMp3">⬇ Download MP3</button>
+        <button class="dl-btn dl-txt" id="dlTxt">⬇ Download TXT</button>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps-grid">
+        <div class="how-card">
+          <div class="how-icon">📸</div>
+          <h4>Upload</h4>
+          <p>Drag or click to upload a photo of any printed document</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">🔬</div>
+          <h4>Preprocess</h4>
+          <p>OpenCV sharpens and binarizes the image for optimal OCR accuracy</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">🔤</div>
+          <h4>Extract</h4>
+          <p>Tesseract OCR reads and extracts all text from the image</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">🔊</div>
+          <h4>Speak</h4>
+          <p>Google Text-to-Speech synthesizes natural-sounding audio instantly</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Built with ♥ · VoiceDoc MVP · <strong>Your College Name</strong></p>
+    <p class="footer-sub">Flask · OpenCV · Tesseract · gTTS</p>
+  </footer>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

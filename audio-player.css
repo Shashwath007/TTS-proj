@@ -1,0 +1,204 @@
+/* =============================================
+   VOICEDOC — audio-player.css
+   Custom audio player: no browser defaults
+   ============================================= */
+
+.custom-player {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  transition: background var(--transition);
+}
+
+[data-theme="light"] .custom-player {
+  background: rgba(124,58,237,0.06);
+}
+
+/* --- Play / Pause Button --- */
+.play-pause-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-teal));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+}
+
+.play-pause-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(124,58,237,0.55);
+}
+
+.play-pause-btn:active { transform: scale(0.96); }
+
+.play-icon, .pause-icon { line-height: 1; }
+
+/* --- Right side of player --- */
+.player-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* --- Seekbar --- */
+.seekbar-wrap {
+  width: 100%;
+}
+
+.seekbar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 10px;
+  background: var(--glass-border);
+  outline: none;
+  cursor: pointer;
+  transition: height 0.2s ease;
+  /* filled portion via JS inline style gradient */
+}
+
+.seekbar:hover { height: 7px; }
+
+.seekbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-purple-light);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(124,58,237,0.5);
+  transition: transform 0.2s ease;
+}
+
+.seekbar::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.seekbar::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-purple-light);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(124,58,237,0.5);
+}
+
+/* --- Bottom row (time + controls) --- */
+.player-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* --- Time Display --- */
+.time-display {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* --- Speed + Volume wrapper --- */
+.speed-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* --- Speed Select --- */
+.speed-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(124,58,237,0.15);
+  border: 1px solid rgba(124,58,237,0.35);
+  border-radius: 6px;
+  color: var(--accent-purple-light);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.speed-select:hover {
+  background: rgba(124,58,237,0.25);
+}
+
+.speed-select option {
+  background: #1a1f36;
+  color: var(--text-primary);
+}
+
+/* --- Volume --- */
+.volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vol-icon {
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 72px;
+  height: 4px;
+  border-radius: 10px;
+  background: var(--glass-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent-teal-light);
+  cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent-teal-light);
+  border: none;
+  cursor: pointer;
+}
+
+/* --- Responsive tweaks --- */
+@media (max-width: 480px) {
+  .custom-player {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .play-pause-btn { align-self: center; }
+  .player-right { width: 100%; }
+  .volume-slider { width: 56px; }
+}
