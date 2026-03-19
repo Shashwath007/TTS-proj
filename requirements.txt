@@ -1,7 +1,6 @@
 flask
 pytesseract
 gtts
-opencv-python
+opencv-python-headless
 Pillow
 numpy
-pix2tex

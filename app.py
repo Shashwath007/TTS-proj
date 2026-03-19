@@ -103,15 +103,22 @@ def convert():
         mode = request.form.get('mode', 'text')
 
         if mode == 'math':
-            try:
-                from pix2tex.cli import LatexOCR
-                model = LatexOCR()
-                pil_img = Image.open(img_path)
-                latex_text = model(pil_img)
-                text = latex_to_speakable(latex_text)
-                raw_latex = latex_text
-            except ImportError:
-                return jsonify({'success': False, 'error': 'pix2tex not installed. Run: pip install pix2tex'}), 500
+            # Use Tesseract with math-optimized settings
+            img = cv2.imread(img_path)
+            if img is None:
+                return jsonify({'success': False, 'error': 'Could not read image file.'}), 400
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # Higher resolution preprocessing for math
+            scale = 2
+            enlarged = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+            blurred = cv2.medianBlur(enlarged, 3)
+            _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            pil_image = Image.fromarray(thresh)
+            # PSM 6 = assume uniform block of text, good for equations
+            custom_config = r'--oem 3 --psm 6'
+            raw_text = pytesseract.image_to_string(pil_image, config=custom_config)
+            text = latex_to_speakable(raw_text.strip())
+            raw_latex = raw_text.strip()
         else:
             img = cv2.imread(img_path)
             if img is None:
@@ -162,4 +169,4 @@ def serve_audio(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=False, port=5000)
