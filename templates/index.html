@@ -52,6 +52,16 @@
         <button class="remove-btn" id="removeBtn" aria-label="Remove image">✕ Remove</button>
       </div>
 
+      <!-- MODE TOGGLE -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeText" onclick="setMode('text')">
+          📝 Text Document
+        </button>
+        <button class="mode-btn" id="modeMath" onclick="setMode('math')">
+          🔢 Math Equation
+        </button>
+      </div>
+
       <!-- CONVERT BUTTON -->
       <button class="convert-btn" id="convertBtn" disabled>
         <span class="btn-icon">⚡</span>
@@ -111,6 +121,15 @@
           <button class="copy-btn" id="copyBtn">📋 Copy</button>
         </div>
         <div class="text-box" id="textBox"></div>
+      </div>
+
+      <!-- LATEX RAW (math mode only) -->
+      <div class="latex-section" id="latexSection" hidden>
+        <div class="section-header">
+          <h3>Raw LaTeX</h3>
+          <button class="copy-btn" id="copyLatexBtn">📋 Copy LaTeX</button>
+        </div>
+        <div class="text-box" id="latexBox"></div>
       </div>
 
       <!-- AUDIO PLAYER -->

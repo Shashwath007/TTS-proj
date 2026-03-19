@@ -605,6 +605,42 @@ body::before {
   transform: translateY(-1px);
 }
 
+/* --- Mode Toggle --- */
+.mode-toggle {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(20,184,166,0.3));
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.mode-btn:hover:not(.active) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-purple);
+}
+
+/* --- LaTeX Section --- */
+.latex-section { margin-bottom: 1.5rem; }
+
 /* --- How It Works --- */
 .how-section {
   margin-top: 3.5rem;

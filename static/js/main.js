@@ -46,6 +46,7 @@ let selectedFile   = null;
 let currentAudioUrl = null;
 let extractedText  = '';
 let stepTimers     = [];
+let currentMode    = 'text';
 
 // ─── Dark Mode ───────────────────────────────
 (function initTheme() {
@@ -147,6 +148,13 @@ function resetFile() {
   convertBtn.disabled = true;
 }
 
+// ─── Mode Toggle ─────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('modeText').classList.toggle('active', mode === 'text');
+  document.getElementById('modeMath').classList.toggle('active', mode === 'math');
+}
+
 // ─── Convert ─────────────────────────────────
 convertBtn.addEventListener('click', () => {
   if (!selectedFile) return;
@@ -182,6 +190,7 @@ async function startConversion() {
   // Actual API call
   const formData = new FormData();
   formData.append('file', selectedFile);
+  formData.append('mode', currentMode);
 
   try {
     const response = await fetch('/convert', {
@@ -249,13 +258,25 @@ function showResults(data) {
   currentAudioUrl = data.audio_url;
 
   // Stats
+  const modeChip = data.mode === 'math' ? '<span class="stat-chip">🔢 Math Mode</span>' : '<span class="stat-chip">📝 Text Mode</span>';
   resultStats.innerHTML = `
+    ${modeChip}
     <span class="stat-chip">📝 ${data.word_count} words</span>
     <span class="stat-chip">🔤 ${data.char_count} chars</span>
   `;
 
   // Text
   textBox.textContent = data.text;
+
+  // LaTeX section (math mode only)
+  const latexSection = document.getElementById('latexSection');
+  const latexBox = document.getElementById('latexBox');
+  if (data.latex) {
+    latexBox.textContent = data.latex;
+    latexSection.hidden = false;
+  } else {
+    latexSection.hidden = true;
+  }
 
   // Audio
   audioEl.src = data.audio_url;
@@ -292,6 +313,20 @@ copyBtn.addEventListener('click', () => {
     setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 2000);
   });
 });
+
+// ─── Copy LaTeX Button ────────────────────────
+const copyLatexBtn = document.getElementById('copyLatexBtn');
+if (copyLatexBtn) {
+  copyLatexBtn.addEventListener('click', () => {
+    const latexText = document.getElementById('latexBox').textContent;
+    if (!latexText) return;
+    navigator.clipboard.writeText(latexText).then(() => {
+      copyLatexBtn.textContent = '✓ Copied!';
+      showToast('LaTeX copied to clipboard!', 'success');
+      setTimeout(() => { copyLatexBtn.textContent = '📋 Copy LaTeX'; }, 2000);
+    });
+  });
+}
 
 // ─── Download MP3 ────────────────────────────
 dlMp3.addEventListener('click', () => {

@@ -4,3 +4,4 @@ gtts
 opencv-python
 Pillow
 numpy
+pix2tex

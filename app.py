@@ -1,6 +1,10 @@
 import os
 import uuid
+import pytesseract
 from flask import Flask, request, jsonify, render_template, send_from_directory
+
+# Windows Tesseract path — update if installed elsewhere
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = Flask(__name__)
 
@@ -16,6 +20,54 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def latex_to_speakable(text):
+    """Convert LaTeX math notation to human-readable spoken text."""
+    replacements = [
+        (r'\frac',        'fraction'),
+        (r'\sqrt',        'square root of'),
+        (r'\int',         'integral of'),
+        (r'\sum',         'summation of'),
+        (r'\prod',        'product of'),
+        (r'\lim',         'limit of'),
+        (r'\infty',       'infinity'),
+        (r'\alpha',       'alpha'),
+        (r'\beta',        'beta'),
+        (r'\gamma',       'gamma'),
+        (r'\delta',       'delta'),
+        (r'\theta',       'theta'),
+        (r'\lambda',      'lambda'),
+        (r'\mu',          'mu'),
+        (r'\sigma',       'sigma'),
+        (r'\pi',          'pi'),
+        (r'\omega',       'omega'),
+        (r'\times',       'times'),
+        (r'\div',         'divided by'),
+        (r'\leq',         'less than or equal to'),
+        (r'\geq',         'greater than or equal to'),
+        (r'\neq',         'not equal to'),
+        (r'\approx',      'approximately equal to'),
+        (r'\rightarrow',  'approaches'),
+        (r'\leftarrow',   'left arrow'),
+        (r'\cdot',        'dot'),
+        (r'\pm',          'plus or minus'),
+        (r'\log',         'log'),
+        (r'\ln',          'natural log'),
+        (r'\sin',         'sine'),
+        (r'\cos',         'cosine'),
+        (r'\tan',         'tangent'),
+        (r'\vec',         'vector'),
+        (r'\hat',         'hat'),
+        (r'^',            ' to the power of '),
+        (r'_',            ' subscript '),
+        (r'{',            ''),
+        (r'}',            ''),
+        (r'\\',           ' '),
+    ]
+    for latex, spoken in replacements:
+        text = text.replace(latex, spoken)
+    return text.strip()
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -26,7 +78,6 @@ def convert():
     try:
         import cv2
         import numpy as np
-        import pytesseract
         from gtts import gTTS
         from PIL import Image
 
@@ -49,39 +100,57 @@ def convert():
 
         file.save(img_path)
 
-        img = cv2.imread(img_path)
-        if img is None:
-            return jsonify({'success': False, 'error': 'Could not read image file.'}), 400
+        mode = request.form.get('mode', 'text')
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.medianBlur(gray, 3)
-        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        if mode == 'math':
+            try:
+                from pix2tex.cli import LatexOCR
+                model = LatexOCR()
+                pil_img = Image.open(img_path)
+                latex_text = model(pil_img)
+                text = latex_to_speakable(latex_text)
+                raw_latex = latex_text
+            except ImportError:
+                return jsonify({'success': False, 'error': 'pix2tex not installed. Run: pip install pix2tex'}), 500
+        else:
+            img = cv2.imread(img_path)
+            if img is None:
+                return jsonify({'success': False, 'error': 'Could not read image file.'}), 400
 
-        pil_image = Image.fromarray(thresh)
-
-        custom_config = r'--oem 3 --psm 6'
-        text = pytesseract.image_to_string(pil_image, config=custom_config)
-        text = text.strip()
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            blurred = cv2.medianBlur(gray, 3)
+            _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            pil_image = Image.fromarray(thresh)
+            custom_config = r'--oem 3 --psm 6'
+            text = pytesseract.image_to_string(pil_image, config=custom_config)
+            text = text.strip()
+            raw_latex = None
 
         if not text:
             return jsonify({'success': False, 'error': 'No text detected in image. Try a clearer image.'}), 400
 
+        os.remove(img_path)
+
         tts = gTTS(text=text, lang='en', slow=False)
         tts.save(mp3_path)
-
-        os.remove(img_path)
 
         word_count = len(text.split())
         char_count = len(text)
         audio_url = f'/audio/{mp3_filename}'
 
-        return jsonify({
+        response_data = {
             'success': True,
             'text': text,
             'audio_url': audio_url,
             'word_count': word_count,
-            'char_count': char_count
-        })
+            'char_count': char_count,
+            'mode': mode
+        }
+
+        if raw_latex:
+            response_data['latex'] = raw_latex
+
+        return jsonify(response_data)
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -93,4 +162,4 @@ def serve_audio(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=False, port=5000)
