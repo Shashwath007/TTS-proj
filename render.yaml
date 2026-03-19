@@ -2,14 +2,5 @@ services:
   - type: web
     name: voicedoc
     runtime: python
-    buildCommand: "apt-get install -y tesseract-ocr && pip install -r requirements.txt"
+    buildCommand: "apt-get install -y tesseract-ocr tesseract-ocr-eng && pip install -r requirements.txt"
     startCommand: "python app.py"
-```
-
----
-
-## Step 3 — Create `Procfile` file
-
-In the same folder, create a new file called exactly `Procfile` (no extension) and paste this:
-```
-web: python app.py
