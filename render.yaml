@@ -2,5 +2,5 @@ services:
   - type: web
     name: voicedoc
     runtime: python
-    buildCommand: "apt-get install -y tesseract-ocr tesseract-ocr-eng && pip install -r requirements.txt"
-    startCommand: "python app.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
