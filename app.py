@@ -1,10 +1,10 @@
 import os
 import uuid
+import platform
 import pytesseract
 from flask import Flask, request, jsonify, render_template, send_from_directory
 
-# Windows Tesseract path — update if installed elsewhere
-import platform
+# Set Tesseract path only on Windows
 if platform.system() == 'Windows':
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -171,4 +171,5 @@ def serve_audio(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
