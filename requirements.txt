@@ -4,3 +4,4 @@ gtts
 opencv-python-headless
 Pillow
 numpy
+gunicorn
