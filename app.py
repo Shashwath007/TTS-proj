@@ -4,7 +4,9 @@ import pytesseract
 from flask import Flask, request, jsonify, render_template, send_from_directory
 
 # Windows Tesseract path — update if installed elsewhere
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import platform
+if platform.system() == 'Windows':
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = Flask(__name__)
 
