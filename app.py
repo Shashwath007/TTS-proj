@@ -1,11 +1,15 @@
 import os
 import uuid
 import platform
+import shutil
 import pytesseract
 from flask import Flask, request, jsonify, render_template, send_from_directory
 
-# Set Tesseract path only on Windows
-if platform.system() == 'Windows':
+# Auto-detect tesseract path
+tesseract_path = shutil.which('tesseract')
+if tesseract_path:
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
+elif platform.system() == 'Windows':
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 app = Flask(__name__)
