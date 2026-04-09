@@ -1,5 +1,7 @@
+providers = ["python"]
+
 [phases.setup]
-nixPkgs = ["tesseract4", "leptonica"]
+nixPkgs = ["tesseract4", "leptonica", "python311"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt"]
