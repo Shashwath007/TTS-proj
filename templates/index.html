@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/style.css" />
   <link rel="stylesheet" href="/static/css/audio-player.css" />
+  <link rel="stylesheet" href="/static/css/auth.css" />
 </head>
 <body>
 
@@ -20,8 +21,35 @@
     <div class="nav-right">
       <span class="nav-tagline">Document → Speech</span>
       {% if username %}
-      <span class="nav-user">👤 {{ username }}</span>
-      <a href="/logout" class="logout-btn">Logout</a>
+      <div class="profile-wrap" id="profileWrap">
+        <button class="profile-btn" id="profileBtn">
+          <span class="profile-avatar">{{ username[0].upper() }}</span>
+          <span class="profile-name">{{ username }}</span>
+          <span class="profile-arrow">▾</span>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown" hidden>
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">{{ username[0].upper() }}</div>
+            <div class="dropdown-info">
+              <span class="dropdown-name">{{ username }}</span>
+              <span class="dropdown-role">{% if username == 'Shashwath007' %}Admin{% else %}User{% endif %}</span>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-stats">
+            <div class="dstat">
+              <span class="dstat-icon">🎙️</span>
+              <span class="dstat-label">VoiceDoc Member</span>
+            </div>
+            <div class="dstat">
+              <span class="dstat-icon">🌙</span>
+              <span class="dstat-label">Dark Mode Enabled</span>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="dropdown-logout">🚪 Logout</a>
+        </div>
+      </div>
       {% endif %}
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">☀️</span>
@@ -207,7 +235,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>Built with ♥ · VoiceDoc MVP · <strong>Your College Name</strong></p>
+    <p>Built with ♥ · VoiceDoc MVP · <strong>NITTE</strong></p>
     <p class="footer-sub">Flask · OpenCV · Tesseract · gTTS</p>
   </footer>
 

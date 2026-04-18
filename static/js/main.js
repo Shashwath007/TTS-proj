@@ -463,3 +463,25 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// --- Profile Dropdown ---
+const profileBtn      = document.getElementById('profileBtn');
+const profileDropdown = document.getElementById('profileDropdown');
+
+if (profileBtn) {
+  profileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !profileDropdown.hidden;
+    profileDropdown.hidden = isOpen;
+    profileBtn.classList.toggle('open', !isOpen);
+  });
+
+  document.addEventListener('click', () => {
+    profileDropdown.hidden = true;
+    profileBtn.classList.remove('open');
+  });
+
+  profileDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+}
