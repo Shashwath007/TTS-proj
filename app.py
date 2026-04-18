@@ -79,14 +79,16 @@ def init_db():
         ADMIN_EMAIL    = os.environ.get('ADMIN_EMAIL',    'shashwath@voicedoc.com')
         ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Admin@1234')
 
-        existing = conn.execute('SELECT id FROM users WHERE username = ?', (ADMIN_USERNAME,)).fetchone()
-        if not existing:
+        existing = conn.execute('SELECT id FROM users WHERE is_admin = 1').fetchone()
+        if existing:
+            conn.execute('UPDATE users SET username = ?, email = ?, password_hash = ? WHERE is_admin = 1',
+                (ADMIN_USERNAME, ADMIN_EMAIL, hash_password(ADMIN_PASSWORD)))
+        else:
             conn.execute(
                 'INSERT INTO users (username, email, password_hash, is_admin, created_at) VALUES (?, ?, ?, 1, ?)',
                 (ADMIN_USERNAME, ADMIN_EMAIL, hash_password(ADMIN_PASSWORD), datetime.utcnow().isoformat())
             )
-            conn.commit()
-
+        conn.commit()
 
 init_db()
 
