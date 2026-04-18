@@ -19,6 +19,10 @@
     </div>
     <div class="nav-right">
       <span class="nav-tagline">Document → Speech</span>
+      {% if username %}
+      <span class="nav-user">👤 {{ username }}</span>
+      <a href="/logout" class="logout-btn">Logout</a>
+      {% endif %}
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
         <span class="toggle-icon" id="toggleIcon">☀️</span>
       </button>
@@ -203,7 +207,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>Built with ♥ · VoiceDoc MVP · <strong>NMAMIT</strong></p>
+    <p>Built with ♥ · VoiceDoc MVP · <strong>Your College Name</strong></p>
     <p class="footer-sub">Flask · OpenCV · Tesseract · gTTS</p>
   </footer>
 

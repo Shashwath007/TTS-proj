@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceDoc — Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/auth.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-bg-glow"></div>
+
+  <div class="auth-container">
+
+    <!-- Brand -->
+    <div class="auth-brand">
+      <span class="brand-icon">🎙️</span>
+      <span class="brand-name">VoiceDoc</span>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card glass-card">
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Join VoiceDoc and start converting documents to speech</p>
+
+      <!-- Error box -->
+      <div class="auth-error" id="authError" hidden></div>
+
+      <!-- Form -->
+      <div class="auth-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="username" placeholder="cooluser123" autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <input type="password" class="form-input" id="password" placeholder="Min 6 characters" autocomplete="new-password" />
+            <button class="toggle-pw" id="togglePw" type="button">👁</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password" />
+        </div>
+
+        <!-- Password strength -->
+        <div class="pw-strength" id="pwStrength" hidden>
+          <div class="pw-bar">
+            <div class="pw-fill" id="pwFill"></div>
+          </div>
+          <span class="pw-label" id="pwLabel"></span>
+        </div>
+
+        <button class="auth-btn" id="registerBtn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-spinner" hidden>⏳</span>
+        </button>
+      </div>
+
+      <p class="auth-switch">
+        Already have an account? <a href="/login" class="auth-link">Sign in</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const usernameEl      = document.getElementById('username');
+    const emailEl         = document.getElementById('email');
+    const passwordEl      = document.getElementById('password');
+    const confirmEl       = document.getElementById('confirmPassword');
+    const registerBtn     = document.getElementById('registerBtn');
+    const btnText         = registerBtn.querySelector('.btn-text');
+    const btnSpinner      = registerBtn.querySelector('.btn-spinner');
+    const authError       = document.getElementById('authError');
+    const togglePw        = document.getElementById('togglePw');
+    const pwStrength      = document.getElementById('pwStrength');
+    const pwFill          = document.getElementById('pwFill');
+    const pwLabel         = document.getElementById('pwLabel');
+
+    togglePw.addEventListener('click', () => {
+      passwordEl.type = passwordEl.type === 'password' ? 'text' : 'password';
+      togglePw.textContent = passwordEl.type === 'password' ? '👁' : '🙈';
+    });
+
+    passwordEl.addEventListener('input', () => {
+      const pw  = passwordEl.value;
+      pwStrength.hidden = pw.length === 0;
+      let strength = 0;
+      if (pw.length >= 6)  strength++;
+      if (pw.length >= 10) strength++;
+      if (/[A-Z]/.test(pw)) strength++;
+      if (/[0-9]/.test(pw)) strength++;
+      if (/[^A-Za-z0-9]/.test(pw)) strength++;
+
+      const levels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6'];
+      const pct    = (strength / 5) * 100;
+
+      pwFill.style.width      = pct + '%';
+      pwFill.style.background = colors[strength - 1] || '#ef4444';
+      pwLabel.textContent     = levels[strength - 1] || 'Very Weak';
+      pwLabel.style.color     = colors[strength - 1] || '#ef4444';
+    });
+
+    function setLoading(state) {
+      registerBtn.disabled = state;
+      btnText.hidden       = state;
+      btnSpinner.hidden    = !state;
+    }
+
+    function showError(msg) {
+      authError.textContent = msg;
+      authError.hidden = false;
+    }
+
+    function hideError() {
+      authError.hidden = true;
+    }
+
+    async function doRegister() {
+      hideError();
+      const username         = usernameEl.value.trim();
+      const email            = emailEl.value.trim();
+      const password         = passwordEl.value;
+      const confirm_password = confirmEl.value;
+
+      if (!username || !email || !password || !confirm_password) {
+        showError('Please fill in all fields.');
+        return;
+      }
+
+      if (password !== confirm_password) {
+        showError('Passwords do not match.');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res  = await fetch('/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, confirm_password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          window.location.href = data.redirect;
+        } else {
+          showError(data.error || 'Registration failed.');
+          setLoading(false);
+        }
+      } catch (err) {
+        showError('Network error. Please try again.');
+        setLoading(false);
+      }
+    }
+
+    registerBtn.addEventListener('click', doRegister);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doRegister();
+    });
+  </script>
+</body>
+</html>

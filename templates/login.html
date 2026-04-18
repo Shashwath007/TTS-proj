@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceDoc — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/auth.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-bg-glow"></div>
+
+  <div class="auth-container">
+
+    <!-- Brand -->
+    <div class="auth-brand">
+      <span class="brand-icon">🎙️</span>
+      <span class="brand-name">VoiceDoc</span>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card glass-card">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to continue converting documents to speech</p>
+
+      <!-- Error box -->
+      <div class="auth-error" id="authError" hidden></div>
+
+      <!-- Form -->
+      <div class="auth-form">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <input type="password" class="form-input" id="password" placeholder="••••••••" autocomplete="current-password" />
+            <button class="toggle-pw" id="togglePw" type="button">👁</button>
+          </div>
+        </div>
+
+        <button class="auth-btn" id="loginBtn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-spinner" hidden>⏳</span>
+        </button>
+      </div>
+
+      <p class="auth-switch">
+        Don't have an account? <a href="/register" class="auth-link">Create one</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const emailEl    = document.getElementById('email');
+    const passwordEl = document.getElementById('password');
+    const loginBtn   = document.getElementById('loginBtn');
+    const btnText    = loginBtn.querySelector('.btn-text');
+    const btnSpinner = loginBtn.querySelector('.btn-spinner');
+    const authError  = document.getElementById('authError');
+    const togglePw   = document.getElementById('togglePw');
+
+    togglePw.addEventListener('click', () => {
+      passwordEl.type = passwordEl.type === 'password' ? 'text' : 'password';
+      togglePw.textContent = passwordEl.type === 'password' ? '👁' : '🙈';
+    });
+
+    function setLoading(state) {
+      loginBtn.disabled = state;
+      btnText.hidden    = state;
+      btnSpinner.hidden = !state;
+    }
+
+    function showError(msg) {
+      authError.textContent = msg;
+      authError.hidden = false;
+    }
+
+    function hideError() {
+      authError.hidden = true;
+    }
+
+    async function doLogin() {
+      hideError();
+      const email    = emailEl.value.trim();
+      const password = passwordEl.value;
+
+      if (!email || !password) {
+        showError('Please fill in all fields.');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res  = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          window.location.href = data.redirect;
+        } else {
+          showError(data.error || 'Login failed.');
+          setLoading(false);
+        }
+      } catch (err) {
+        showError('Network error. Please try again.');
+        setLoading(false);
+      }
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>
