@@ -1,21 +1,32 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install Tesseract and dependencies
+RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
-    ffmpeg \
+    libgomp1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Set working directory
 WORKDIR /app
+
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy all project files
 COPY . .
+
+# Create necessary folders
 RUN mkdir -p uploads static/audio
 
-EXPOSE 5000
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app
+# Expose port
+EXPOSE 8080
+
+# Start app
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
