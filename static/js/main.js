@@ -50,7 +50,7 @@ let currentMode    = 'text';
 
 // ─── Dark Mode ───────────────────────────────
 (function initTheme() {
-  const saved = localStorage.getItem('voicedoc-theme') || 'dark';
+  const saved = localStorage.getItem('voicedoc-theme') || 'light';
   applyTheme(saved);
 })();
 
@@ -462,26 +462,4 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-// --- Profile Dropdown ---
-const profileBtn      = document.getElementById('profileBtn');
-const profileDropdown = document.getElementById('profileDropdown');
-
-if (profileBtn) {
-  profileBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !profileDropdown.hidden;
-    profileDropdown.hidden = isOpen;
-    profileBtn.classList.toggle('open', !isOpen);
-  });
-
-  document.addEventListener('click', () => {
-    profileDropdown.hidden = true;
-    profileBtn.classList.remove('open');
-  });
-
-  profileDropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
 }
