@@ -1,204 +1,170 @@
-/* =============================================
-   VOICEDOC — audio-player.css
-   Custom audio player: no browser defaults
-   ============================================= */
+/* ============================================================
+   VoiceDoc — audio-player.css
+   Matches warm cream / dusty rose / sage palette from style.css
+   ============================================================ */
 
 .custom-player {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  transition: background var(--transition);
+  gap: 14px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
 }
 
-[data-theme="light"] .custom-player {
-  background: rgba(124,58,237,0.06);
-}
-
-/* --- Play / Pause Button --- */
+/* Play / Pause */
 .play-pause-btn {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-teal));
+  background: var(--sage);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  flex-shrink: 0;
   color: #fff;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  font-size: 13px;
+  transition: background 0.2s, transform 0.1s;
 }
+.play-pause-btn:hover  { background: var(--sage-dark); }
+.play-pause-btn:active { transform: scale(0.95); }
 
-.play-pause-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 24px rgba(124,58,237,0.55);
-}
-
-.play-pause-btn:active { transform: scale(0.96); }
-
-.play-icon, .pause-icon { line-height: 1; }
-
-/* --- Right side of player --- */
+/* Right side */
 .player-right {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
+  gap: 8px;
 }
 
-/* --- Seekbar --- */
-.seekbar-wrap {
-  width: 100%;
-}
+/* Seekbar */
+.seekbar-wrap { width: 100%; }
 
 .seekbar {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 5px;
-  border-radius: 10px;
-  background: var(--glass-border);
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
   outline: none;
   cursor: pointer;
-  transition: height 0.2s ease;
-  /* filled portion via JS inline style gradient */
+  transition: background 0.2s;
 }
-
-.seekbar:hover { height: 7px; }
-
 .seekbar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--accent-purple-light);
+  background: var(--rose);
+  border: 2px solid var(--surface);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(124,58,237,0.5);
-  transition: transform 0.2s ease;
+  transition: background 0.2s, transform 0.1s;
 }
-
-.seekbar::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
 .seekbar::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--accent-purple-light);
+  background: var(--rose);
+  border: 2px solid var(--surface);
   cursor: pointer;
-  border: none;
-  box-shadow: 0 0 8px rgba(124,58,237,0.5);
 }
+.seekbar:hover::-webkit-slider-thumb { background: var(--rose-dark); transform: scale(1.15); }
 
-/* --- Bottom row (time + controls) --- */
+/* Bottom row */
 .player-bottom-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 10px;
 }
 
-/* --- Time Display --- */
 .time-display {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
   white-space: nowrap;
 }
 
-/* --- Speed + Volume wrapper --- */
 .speed-volume-wrap {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
-/* --- Speed Select --- */
+/* Speed select */
 .speed-select {
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(124,58,237,0.15);
-  border: 1px solid rgba(124,58,237,0.35);
-  border-radius: 6px;
-  color: var(--accent-purple-light);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
   cursor: pointer;
-  outline: none;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s;
 }
+.speed-select:hover { border-color: var(--rose); }
+.speed-select:focus { outline: none; border-color: var(--sage); }
 
-.speed-select:hover {
-  background: rgba(124,58,237,0.25);
-}
-
-.speed-select option {
-  background: #1a1f36;
-  color: var(--text-primary);
-}
-
-/* --- Volume --- */
+/* Volume */
 .volume-wrap {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 6px;
 }
 
 .vol-icon {
-  font-size: 0.9rem;
+  font-size: 13px;
+  color: var(--text-muted);
   cursor: pointer;
+  transition: color 0.2s;
   user-select: none;
 }
+.vol-icon:hover { color: var(--rose); }
 
 .volume-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 72px;
+  width: 70px;
   height: 4px;
-  border-radius: 10px;
-  background: var(--glass-border);
+  background: var(--border);
+  border-radius: 2px;
   outline: none;
   cursor: pointer;
 }
-
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--accent-teal-light);
+  background: var(--sand);
+  border: 2px solid var(--surface);
   cursor: pointer;
+  transition: background 0.2s;
 }
-
 .volume-slider::-moz-range-thumb {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--accent-teal-light);
-  border: none;
+  background: var(--sand);
+  border: 2px solid var(--surface);
   cursor: pointer;
 }
+.volume-slider:hover::-webkit-slider-thumb { background: var(--rose); }
 
-/* --- Responsive tweaks --- */
+/* Responsive */
 @media (max-width: 480px) {
-  .custom-player {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .play-pause-btn { align-self: center; }
+  .custom-player { flex-wrap: wrap; }
   .player-right { width: 100%; }
-  .volume-slider { width: 56px; }
+  .volume-slider { width: 50px; }
 }
